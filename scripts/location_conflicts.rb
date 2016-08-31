@@ -4,10 +4,10 @@ class LocationConflictsReport
   require 'mysql2'
   require 'net/ssh/gateway'
   require 'archivesspace-api-utility'
-  require './as_config.rb'
+  require '../config/as_config.rb'
   require 'date'
-  require './reports_config.rb'
-  require './mysql_connect.rb'
+  require '../config/reports_config.rb'
+  require '../mysql_connect.rb'
   require 'fileutils'
 
   include MysqlConnect
@@ -138,13 +138,13 @@ class LocationConflictsReport
       check_top_container_locations(resource_id)
     end
 
-    if !Dir.exist?('./reports')
-      Dir.mkdir('./reports')
+    if !Dir.exist?('../reports')
+      Dir.mkdir('../reports')
     end
 
     @report_filepath = "reports/location_conflicts.html"
 
-    f = File.new("./#{ @report_filepath }",'w')
+    f = File.new("../#{ @report_filepath }",'w')
 
     f.puts "<html>"
     f.puts "<head><link rel='stylesheet' type='text/css' href='../css/reports.css'/></head>"

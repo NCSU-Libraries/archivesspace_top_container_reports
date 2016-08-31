@@ -4,5 +4,6 @@
 /*/._DS_Store
 /tmp/*
 /*.html
+/config/config.yml
 /config.yml
 /reports

@@ -1,6 +1,6 @@
 module MysqlConnect
 
-  require './reports_config.rb'
+  require './config/reports_config.rb'
 
   def self.included receiver
     receiver.extend self
