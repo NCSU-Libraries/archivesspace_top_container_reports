@@ -1,0 +1,8 @@
+body {
+  font-family: helvetica, sans-serif;
+}
+
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+}

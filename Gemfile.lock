@@ -1,0 +1,15 @@
+GIT
+  remote: https://github.com/trevorthornton/archivesspace-api-utility.git
+  revision: d629907fafb9ef7842c462fb22dd909df55a6508
+  specs:
+    archivesspace-api-utility (0.0.6.2)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  archivesspace-api-utility!
