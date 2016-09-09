@@ -1,7 +1,7 @@
 class ConfigTest
 
   require 'archivesspace-api-utility'
-  require './as_config.rb'
+  require 'config/as_config.rb'
 
   @@a = ArchivesSpaceApiUtility::ArchivesSpaceSession.new
 

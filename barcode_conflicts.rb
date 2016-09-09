@@ -1,21 +1,18 @@
-class BarcodeConflictsReport
+require 'rubygems'
+require 'mysql2'
+require 'net/ssh/gateway'
+require_relative 'config/reports_config.rb'
+require_relative 'config/mysql_connect.rb'
+require 'fileutils'
 
-  require 'rubygems'
-  require 'mysql2'
-  require 'net/ssh/gateway'
-  require 'archivesspace-api-utility'
-  require '../config/as_config.rb'
-  require 'date'
-  require '../config/reports_config.rb'
-  require '../mysql_connect.rb'
-  require 'fileutils'
+
+class BarcodeConflictsReport
 
   include MysqlConnect
   include ReportsConfig
 
   @@config = config_values
   @@mysql_client = mysql_client
-  @@a = ArchivesSpaceApiUtility::ArchivesSpaceSession.new
 
 
   def initialize
@@ -24,9 +21,10 @@ class BarcodeConflictsReport
 
 
   def get_resource_ids
-    path = "/repositories/2/resources"
-    response = @a.get(path, all_ids: true)
-    JSON.parse(response.body)
+    ids = []
+    results = @@mysql_client.query("SELECT id FROM resource where id IS NOT NULL")
+    results.each { |r| ids << r['id'] }
+    ids
   end
 
 
@@ -55,7 +53,7 @@ class BarcodeConflictsReport
     resource_title = nil
     q = top_container_barcodes_query(resource_id)
 
-    results = $mysql_client.query(q)
+    results = @@mysql_client.query(q)
 
     results.each do |r|
       resource_title ||= r['resource_title']
@@ -129,16 +127,19 @@ class BarcodeConflictsReport
       check_top_container_barcodes(resource_id)
     end
 
-    if !Dir.exist?('../reports')
-      Dir.mkdir('../reports')
+    if !Dir.exist?('reports')
+      Dir.mkdir('reports')
     end
 
     @report_filepath = "reports/barcode_conflicts.html"
 
-    f = File.new("../#{ @report_filepath }",'w')
+    f = File.new("./#{ @report_filepath }",'w')
 
     f.puts "<html>"
-    f.puts "<head><link rel='stylesheet' type='text/css' href='../css/reports.css'/></head>"
+    f.puts "<head><style>\n"
+    f.puts "body { font-family: helvetica, sans-serif; }\n
+      main { max-width: 1000px; margin: 0 auto; }\n"
+    f.puts "</style></head>"
     f.puts "<body>"
     f.puts "<main>"
     f.puts "<h1>Top containers with barcode conflicts</h1>"

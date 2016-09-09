@@ -1,6 +1,6 @@
-module ArchivesSpaceApiUtility
+require_relative './reports_config.rb'
 
-  require './reports_config.rb'
+module ArchivesSpaceApiUtility
 
   class << self
     attr_accessor :configuration

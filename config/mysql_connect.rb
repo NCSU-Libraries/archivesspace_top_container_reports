@@ -1,6 +1,6 @@
-module MysqlConnect
+require_relative './reports_config.rb'
 
-  require './config/reports_config.rb'
+module MysqlConnect
 
   def self.included receiver
     receiver.extend self
@@ -21,8 +21,16 @@ module MysqlConnect
       port = @config[:mysql_port]
     end
 
-    Mysql2::Client.new(:host => host, :username => @config[:archivesspace_mysql_username],
-      :password => @config[:archivesspace_mysql_password], :database => @config[:archivesspace_mysql_database], :port => port)
+    mysql_connection_params = {
+      :host => host,
+      :username => @config[:archivesspace_mysql_username],
+      :database => @config[:archivesspace_mysql_database],
+      :port => port
+    }
+    if @config[:archivesspace_mysql_password]
+      mysql_connection_params[:password] = @config[:archivesspace_mysql_password]
+    end
+    Mysql2::Client.new(mysql_connection_params)
   end
 
 end
