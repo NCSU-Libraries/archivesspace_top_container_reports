@@ -13,6 +13,12 @@ class DuplicateBarcodesReport
   @@config = config_values
   @@mysql_client = mysql_client
 
+  def initialize
+    @duplicate_barcodes = []
+    @report_entries = {}
+  end
+
+
   def get_barcodes
     q = "SELECT DISTINCT barcode_1 FROM container WHERE barcode_1 IS NOT NULL"
     results = @@mysql_client.query(q)
@@ -26,6 +32,18 @@ class DuplicateBarcodesReport
       join instance i on i.id = c.instance_id
       left join archival_object ao on ao.id = i.archival_object_id
       left join resource r on r.id = i.resource_id
+      where c.barcode_1 = '#{ barcode }'"
+    @@mysql_client.query(q)
+  end
+
+
+  def get_container_data_for_barcode(barcode)
+    q = "select c.indicator_1 as top_container_indicator,
+      ev.value as top_container_type,
+      i.resource_id, i.archival_object_id, i.accession_id
+      from container c
+      join instance i on i.id = c.instance_id
+      left join enumeration_value ev on ev.id = c.type_1_id
       where c.barcode_1 = '#{ barcode }'"
     @@mysql_client.query(q)
   end
@@ -50,18 +68,153 @@ class DuplicateBarcodesReport
         dups = true
       end
     end
+
+
     dups
   end
 
 
-  def generate
+  def get_resource_data(resource_id)
+    q = "SELECT * from resource where id=#{ resource_id } LIMIT 1"
+    results = @@mysql_client.query(q)
+    results.first
+  end
+
+
+  def get_resource_data_from_archival_object(archival_object_id)
+    q = "SELECT r.* from resource r
+      JOIN archival_object ao on ao.root_record_id = r.id
+      where ao.id=#{ archival_object_id } LIMIT 1"
+    results = @@mysql_client.query(q)
+    results.first
+  end
+
+
+  def get_accession_data(accesion_id)
+    q = "SELECT * from accession where id=#{ accesion_id } LIMIT 1"
+    results = @@mysql_client.query(q)
+    results.first
+  end
+
+
+  def generate_report_data
+    @duplicate_barcodes.each do |b|
+      @report_entries[b] = {}
+      container_data = get_container_data_for_barcode(b)
+      container_data.each do |c_data|
+        top_container = "#{ c_data['top_container_type'] } #{ c_data['top_container_indicator']}"
+        if c_data['resource_id'] || c_data['archival_object_id']
+          if c_data['resource_id']
+            record_url_fragment = "/resources/#{ c_data['resource_id'] }"
+            resource_data = get_resource_data(c_data['resource_id'])
+            key = record_url_fragment
+          else
+            resource_data = get_resource_data_from_archival_object(c_data['archival_object_id'])
+            record_url_fragment = "/resources/#{ resource_data['id'] }#tree::archival_object_"
+            key = "/resources/#{ resource_data['id'] }"
+          end
+          @report_entries[b][key] ||= {
+            title: resource_data['title'],
+            type: 'resource',
+            containers: {}
+          }
+
+        elsif c_data['accession_id']
+          record_url_fragment = "/accessions/#{ c_data['accession_id'] }"
+          key = record_url_fragment
+          accession_data = get_accession_data(c_data['accession_id'])
+          @report_entries[b][key] ||= {
+            title: accession_data['title'],
+            type: 'accession',
+            containers: {}
+          }
+        end
+        @report_entries[b][key][:containers][top_container] ||= []
+        @report_entries[b][key][:containers][top_container] << record_url_fragment
+      end
+    end
+  end
+
+
+  ### FOR TESTING ONLY - DELETE! ###
+  def test_find_duplicates
+    barcodes = get_barcodes
+    i = 0
+    barcodes.each do |b|
+      if i == 3
+        break
+      else
+        if has_duplicates(b)
+          @duplicate_barcodes << b
+          puts "#{ b } has duplicates"
+          i += 1
+        end
+      end
+    end
+  end
+
+
+  def find_duplicates
     barcodes = get_barcodes
     barcodes.each do |b|
       if has_duplicates(b)
+        @duplicate_barcodes << b
         puts "#{ b } has duplicates"
       end
     end
   end
+
+
+  def generate_report_html
+    @report_filepath = "reports/duplicate_barcodes.html"
+    @aspace_root = "#{ @@config[:archivesspace_https] ? 'https' : 'http' }://#{ @@config[:archivesspace_host] }:#{ @@config[:archivesspace_frontend_port] }"
+    f = File.new("./#{ @report_filepath }",'w')
+    f.puts "<html>"
+    f.puts "<head><style>\n"
+    f.puts "body { font-family: helvetica, sans-serif; }\n
+      main { max-width: 1000px; margin: 0 auto; }\n"
+    f.puts "</style></head>"
+    f.puts "<body>"
+    f.puts "<main>"
+    f.puts "<h1>Barcodes duplicated in different top containers</h1>"
+    @report_entries.each do |barcode, records|
+      f.puts "<h2>#{ barcode }</h2>"
+      f.puts "<ul>"
+      records.each do |uri, record_data|
+        f.puts "<li>#{ record_data[:title] } (#{ record_data[:type] })"
+        f.puts "<ul>"
+        record_data[:containers].each do |top_container, url_fragments|
+          f.puts "<li>#{ top_container }"
+          f.puts "<ul>"
+          url_fragments.each do |url_fragment|
+            url = @aspace_root + url_fragment
+            f.puts "<li><a href=\"#{ url }\" target=\"_blank\">#{ url }</a></li>"
+          end
+          f.puts "</ul>"
+          f.puts "</li>"
+        end
+        f.puts "</ul>"
+        f.puts "</li>"
+      end
+      f.puts "</ul>"
+    end
+
+    f.puts "</main>\n</body>\n</html>"
+    f.close
+    puts "Report complete - see #{ @report_filepath }"
+  end
+
+
+
+  def generate
+    test_find_duplicates
+    generate_report_data
+    generate_report_html
+  end
+
+
+
+
 
 end
 

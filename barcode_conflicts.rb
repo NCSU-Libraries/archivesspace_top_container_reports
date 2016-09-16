@@ -144,7 +144,7 @@ class BarcodeConflictsReport
     f.puts "<main>"
     f.puts "<h1>Top containers with barcode conflicts</h1>"
 
-    aspace_root = "http://archives.lib.ncsu.edu:8180"
+    aspace_root = "#{ @@config[:archivesspace_https] ? 'https' : 'http' }://#{ @@config[:archivesspace_host] }:#{ @@config[:archivesspace_frontend_port] }"
 
     @report_entries.each do |resource_id, v|
       resource_url = "#{ aspace_root }/resources/#{ resource_id }"
@@ -175,7 +175,7 @@ class BarcodeConflictsReport
 
     f.close
 
-    puts "Report complete - see #{ @report_filename }"
+    puts "Report complete - see #{ @report_filepath }"
   end
 
 end
