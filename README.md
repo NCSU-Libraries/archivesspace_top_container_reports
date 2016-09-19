@@ -22,7 +22,7 @@ The file config/config.yml is where you will specify the info required to connec
 
 The reports will provide links to your ArchivesSpace instance based on the values provided here.
 
-* **archivesspace\_host:** The host name of the server where your AS instance is deployed.
+* **archivesspace\_host:** The host name of the server where your ArchivesSpace instance is deployed.
 * **archivesspace\_frontend\_port:** The port on which your ArchivesSpace front end (staff interface) is accessed (default is 8080)
 * **archivesspace\_https:** Set to true if ArchivesSpace is accessed via https
 
@@ -33,7 +33,7 @@ The reports will provide links to your ArchivesSpace instance based on the value
 * **mysql\_username:** User with permissions to query the ArchivesSapce database
 * **mysql\_password:** Password associated with the MySQL user. If your database does not require a password for authentication you can remove this line and the scripts will attempt to connect without one.
 * **mysql\_port:** Port used to access the MySQL database. This is typically 3306 and will default to that if this line is omitted
-* **mysql\_ssh:** If the database server requires SSH connection, set this to true and provide addition information for the following parameters:
+* **mysql\_ssh:** If the database server requires SSH connection, set this to true and provide values for the following parameters:
   * **mysql\_ssh\_username:** SSH user name used to connect to the server (probably different than the database user name)
   * **mysql\_ssh\_password:** Password associated with the SSH user
 
