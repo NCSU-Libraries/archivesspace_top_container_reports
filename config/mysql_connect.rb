@@ -23,12 +23,12 @@ module MysqlConnect
 
     mysql_connection_params = {
       :host => host,
-      :username => @config[:archivesspace_mysql_username],
-      :database => @config[:archivesspace_mysql_database],
+      :username => @config[:mysql_username],
+      :database => @config[:mysql_database],
       :port => port
     }
-    if @config[:archivesspace_mysql_password]
-      mysql_connection_params[:password] = @config[:archivesspace_mysql_password]
+    if @config[:mysql_password]
+      mysql_connection_params[:password] = @config[:mysql_password]
     end
     Mysql2::Client.new(mysql_connection_params)
   end

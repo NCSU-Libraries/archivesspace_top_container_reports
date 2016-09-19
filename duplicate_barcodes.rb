@@ -136,7 +136,7 @@ class DuplicateBarcodesReport
   end
 
 
-  ### FOR TESTING ONLY - DELETE! ###
+  ### FOR TESTING ONLY - return first 3 records to test report###
   def test_find_duplicates
     barcodes = get_barcodes
     i = 0
@@ -207,101 +207,13 @@ class DuplicateBarcodesReport
 
 
   def generate
-    test_find_duplicates
+    find_duplicates
     generate_report_data
     generate_report_html
   end
-
-
-
 
 
 end
 
 report = DuplicateBarcodesReport.new
 report.generate
-
-
-# select distinct (concat(ao.root_record_id,'-',c.type_1_id,'-',c.indicator_1))
-# from container c
-# join instance i on i.id = c.instance_id
-# join archival_object ao on ao.id = i.archival_object_id
-# where c.barcode_1 = 'S02247998+'
-
-
-
-# def add_resource_identifier(data)
-#   identifiers = data['identifier']
-#   ids = JSON.parse(identifiers)
-#   data['resource_identifier'] = ids[0]
-#   data
-# end
-
-# def get_data_for_archival_object(archival_object_ids)
-#   q = "#{ $q_common } WHERE ao.id IN (#{ archival_object_ids.join(',') })"
-#   results = $mysql_client.query(q)
-#   results.to_a.map { |r| add_resource_identifier(r) }
-# end
-
-# def get_data_for_barcode(barcodes)
-#   q = "#{ $q_common } WHERE c.barcode_1 IN ('#{ barcodes.join("','") }')"
-#   results = $mysql_client.query(q)
-#   results.to_a.map { |r| add_resource_identifier(r) }
-# end
-
-
-# def get_top_container_data(archival_object_ids)
-#   data = []
-#   barcodes = []
-#   ao_data = get_data_for_archival_object(archival_object_ids)
-#   data += ao_data
-#   ao_data.each do |hash|
-#     if hash['barcode']
-#       barcodes << hash['barcode']
-#     end
-#   end
-
-#   b_data = get_data_for_barcode(barcodes)
-#   data += b_data
-
-#   data.uniq
-# end
-
-
-
-
-# top_container_data = []
-# ids = File.open('./archival_object_ids.txt')
-
-# i = 1
-
-# batch = []
-
-# ids.each_line do |l|
-#   puts l
-#   l.strip!
-#   batch << l
-#   if i == 100
-#     batch_data = get_top_container_data(batch)
-#     puts batch_data.inspect
-#     top_container_data += batch_data
-#     i = 1
-#   else
-#     i += 1
-#   end
-# end
-
-
-# top_container_data.uniq!
-
-# report = File.new('./duplicate_barcodes.csv','w')
-# report.puts($fields.join(','))
-# top_container_data.each do |d|
-#   line_elements = []
-#   $fields.each do |f|
-
-#     line_elements << (d[f] || '')
-#   end
-#   report.puts('"' + line_elements.join('","') + '"')
-# end
-

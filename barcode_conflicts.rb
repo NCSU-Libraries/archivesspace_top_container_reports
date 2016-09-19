@@ -154,7 +154,7 @@ class BarcodeConflictsReport
         f.puts "<li>#{ top_container }"
         f.puts "<ul>"
         data[:barcodes].each do |barcode, bdata|
-          f.puts "<li>#{ !(barcode.nil? || barcode.empty?) ? barcode : '[BLANK]' }"
+          f.puts "<li>#{ !(barcode.nil? || barcode.empty?) ? barcode.gsub(/\&/,'&amp;') : '[BLANK]' }"
           f.puts "<ul>"
 
           bdata[:archival_object_id].each do |aoid|
