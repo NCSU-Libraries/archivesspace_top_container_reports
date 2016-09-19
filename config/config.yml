@@ -1,0 +1,11 @@
+archivesspace_host: 'your.archivesspace.host'
+archivesspace_frontend_port: 8080
+archivesspace_https: false
+mysql_host: 'mysql_host'
+mysql_database: 'archivesspace_database_name'
+mysql_username: 'your_mysql_username'
+mysql_password: 'your_mysql_password'
+mysql_ssh: false
+mysql_ssh_username: 'ssh_username'
+mysql_ssh_password: 'ssh_password'
+mysql_port: 3306

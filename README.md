@@ -9,14 +9,14 @@ A set of Ruby scripts to report common problems with ArchivesSpace top container
 
 ## Installation
 
-1. Clone or download this repository. Do not change the locations of the folders or files within the cloned/downloaded directory.
+1. Clone or download this repository. **Do not change the locations of the folders or files within the archivesspace\_top\_container\_reports directory**.
 2. From within the base directory (archivesspace\_top\_container\_reports) run: `bundle install`
 
 That should be it.
 
 ## Configuration
 
-The file config/config.yml is where you will specify the info required to connect to your database and to provide links to your ArchivesSpace instance in the generated reports. Each line of this file is a different configuration option. Some of these are optional and can be left out, but DO NOT LEAVE BLANK SPACES BETWEEN LINES.
+The file config/config.yml is where you will specify the info required to connect to your database and to provide links to your ArchivesSpace instance in the generated reports. Each line of this file is a different configuration option. Some of these are optional and can be left out, but **do not leave blank spaces between lines**.
 
 ### ArchivesSpace information
 
